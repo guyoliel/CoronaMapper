@@ -13,34 +13,11 @@ export class MapService {
   }
 
 
-  getMarkers(): Array<any> {
-    const geoJson = [{
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: ['80.20929129999999', '13.0569951']
-      },
-      properties: {
-        message: 'Chennai'
-      }
-    }, {
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: ['77.350048', '12.953847' ]
-      },
-      properties: {
-        message: 'bangulare'
-      }
-    }];
+  getMarkers(): Array<GeoJson> {
+    const geoJson = [
+      new GeoJson(['80.20929129999999', '13.0569951'], {message: 'Chennai'}),
+      new GeoJson(['77.350048', '12.953847' ], {message: 'bangulare'})
+    ];
     return geoJson;
-  }
-
-  createMarker(data: GeoJson) {
-    return [];
-  }
-
-  removeMarker($key: string) {
-    return {};
   }
 }
