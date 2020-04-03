@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 
-import { GeoJson } from './map';
+import { GeoJson } from '../models/GeoJson';
 import * as mapboxgl from 'mapbox-gl';
 import { Observable } from 'rxjs';
 

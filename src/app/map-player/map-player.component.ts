@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import * as mapboxgl from 'mapbox-gl';
-import { MapService } from './map.service';
-import { GeoJson, FeatureCollection } from './map';
+import { MapService } from '../services/map.service';
+import { CoronaService } from '../services/corona.service';
+import { GeoJson } from '../models/GeoJson';
+import { FeatureCollection } from '../models/FeatureCollection';
 
 
 @Component({
@@ -22,11 +24,11 @@ export class MapPlayerComponent implements OnInit{
   source: any;
   markers: any;
 
-  constructor(private mapService: MapService) {
+  constructor(private mapService: MapService, private coronaService: CoronaService) {
   }
 
   ngOnInit() {
-    this.markers = this.mapService.getMarkers();
+    this.coronaService.getCountriesData().subscribe(x => this.markers = x as GeoJson[]);
     this.initializeMap();
   }
 
@@ -50,7 +52,7 @@ export class MapPlayerComponent implements OnInit{
     this.map = new mapboxgl.Map({
       container: 'map',
       style: this.style,
-      zoom: 13,
+      zoom: 7,
       center: [this.lng, this.lat]
     });
 
@@ -61,7 +63,7 @@ export class MapPlayerComponent implements OnInit{
     this.map.on('load', (event) => {
 
       this.map.loadImage('../../assets/virus.png',function(error, image) {
-        if (error) throw error;
+        if (error) { throw error; }
         self.map.addImage('virus', image);
       });
 
@@ -92,7 +94,8 @@ export class MapPlayerComponent implements OnInit{
           'text-transform': 'uppercase',
           'icon-image': 'virus',
           'icon-size': 0.08,
-          'text-offset': [0, 1.5]
+          'text-offset': [0, 1.5],
+          "icon-allow-overlap": true
         },
         paint: {
           'text-color': '#791212',
@@ -102,10 +105,6 @@ export class MapPlayerComponent implements OnInit{
       });
 
     });
-  }
-  /// Helpers
-  removeMarker(marker) {
-    this.mapService.removeMarker(marker.$key)
   }
 
   flyTo(data: GeoJson) {
