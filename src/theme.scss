@@ -6,3 +6,19 @@ $my-app-accent:  mat-palette($mat-purple, 500, 900, A100);
 $my-app-warn:    mat-palette($mat-deep-orange);
 $my-app-theme: mat-light-theme($my-app-primary, $my-app-accent, $my-app-warn);
 @include angular-material-theme($my-app-theme);
+
+.accent-color {
+    color: mat-color($my-app-accent) !important;
+}
+
+.primary-color {
+    color: mat-color($my-app-primary) !important;
+}
+
+.warn-color {
+    color: mat-color($my-app-warn) !important;
+}
+
+.error-color {
+    color: #b71c1c !important;
+}

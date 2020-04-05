@@ -4,7 +4,8 @@ import { MapService } from '../services/map.service';
 import { CoronaService } from '../services/corona.service';
 import { GeoJson } from '../models/GeoJson';
 import { FeatureCollection } from '../models/FeatureCollection';
-
+import { DynamicComponentService } from '../services/dynamic-component.service';
+import { TotalsPopupComponent } from './totals-popup/totals-popup.component';
 
 @Component({
   selector: 'map-player',
@@ -24,12 +25,14 @@ export class MapPlayerComponent implements OnInit{
   source: any;
   markers: any;
 
-  constructor(private mapService: MapService, private coronaService: CoronaService) {
+  constructor(private mapService: MapService,
+              private coronaService: CoronaService,
+              private dynamicComponentService: DynamicComponentService) {
   }
 
   ngOnInit() {
-    this.coronaService.getCountriesData().subscribe(x => this.markers = x as GeoJson[]);
     this.initializeMap();
+    this.coronaService.getCountriesData().subscribe(x => this.markers = x as GeoJson[]);
   }
 
   private initializeMap() {
@@ -58,6 +61,9 @@ export class MapPlayerComponent implements OnInit{
 
     /// Add map controls
     this.map.addControl(new mapboxgl.NavigationControl());
+
+    this.setupMapCursorEvents();
+
     const self = this;
     /// Add realtime firebase data on map load
     this.map.on('load', (event) => {
@@ -68,7 +74,7 @@ export class MapPlayerComponent implements OnInit{
       });
 
       /// register source
-      this.map.addSource('data_layer', {
+      this.map.addSource('markers_layer', {
          type: 'geojson',
          data: {
            type: 'FeatureCollection',
@@ -77,7 +83,7 @@ export class MapPlayerComponent implements OnInit{
       });
 
       /// get source
-      this.source = this.map.getSource('data_layer');
+      this.source = this.map.getSource('markers_layer');
 
       /// subscribe to realtime database and set data source
       let data = new FeatureCollection(this.markers);
@@ -86,7 +92,7 @@ export class MapPlayerComponent implements OnInit{
       /// create map layers with realtime data
       this.map.addLayer({
         id: 'markers_layer',
-        source: 'data_layer',
+        source: 'markers_layer',
         type: 'symbol',
         layout: {
           'text-field': '{message}',
@@ -95,7 +101,7 @@ export class MapPlayerComponent implements OnInit{
           'icon-image': 'virus',
           'icon-size': 0.08,
           'text-offset': [0, 1.5],
-          "icon-allow-overlap": true
+          'icon-allow-overlap': true
         },
         paint: {
           'text-color': '#791212',
@@ -112,4 +118,34 @@ export class MapPlayerComponent implements OnInit{
       center: data.geometry.coordinates
     });
   }
+
+  setupMapCursorEvents(){
+    this.map.on('click', 'markers_layer', (e) => {
+      const coordinates = e.features[0].geometry.coordinates.slice();
+      // Inside a map.on("click") or wherever you want to create your popup
+
+      // Inject Component and Render Down to HTMLDivElement Object
+      const popupContent = this.dynamicComponentService.injectComponent(
+        TotalsPopupComponent,
+        x => x.properties = e.features[0].properties); // This Is where You can pass
+      // a Model or other Properties to your Component
+
+      new mapboxgl.Popup({ closeOnClick: false })
+      .setLngLat(coordinates) 
+      .setDOMContent(popupContent)
+      .addTo(this.map);
+
+    });
+
+    // Change the cursor to a pointer when the mouse is over the places layer.
+    this.map.on('mouseenter', 'markers_layer', () => {
+      this.map.getCanvas().style.cursor = 'pointer';
+    });
+
+    // Change it back to a pointer when it leaves.
+    this.map.on('mouseleave', 'markers_layer', () => {
+      this.map.getCanvas().style.cursor = '';
+    });
+  }
+
 }

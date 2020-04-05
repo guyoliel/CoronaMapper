@@ -3,15 +3,15 @@ import { environment } from '../../environments/environment';
 
 import { GeoJson } from '../models/GeoJson';
 import * as mapboxgl from 'mapbox-gl';
-import { Observable } from 'rxjs';
 
 @Injectable()
 export class MapService {
 
+  public mapboxgl = mapboxgl;
+
   constructor() {
     mapboxgl.accessToken = environment.mapbox.accessToken
   }
-
 
   getMarkers(): Array<GeoJson> {
     const geoJson = [

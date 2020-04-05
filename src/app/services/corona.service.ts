@@ -15,7 +15,7 @@ export class CoronaService {
     return this.http.get('https://pomber.github.io/covid19/timeseries.json')
     .pipe(
       map(allCountries => Object.keys(allCountries).map(key => {  // * Transform countries dict to array
-        return {name: key /*, value: allCountries[key]*/, locationData: undefined};
+        return {name: key , value: allCountries[key], locationData: undefined};
       }).
       map(country => { // * Enrich each country with location from countries service
         country.locationData = this.countriesService.getCountry(country.name);
@@ -23,7 +23,10 @@ export class CoronaService {
       })
       .filter(country => country.locationData)
       .map(country => {
-        return new GeoJson([country.locationData.latlng[1],country.locationData.latlng[0]], {message: country.name}); })
+        const coordinates = [country.locationData.latlng[1], country.locationData.latlng[0]];
+        const properties = {data: country.value , message: country.name};
+        return new GeoJson(coordinates, properties);
+      })
     ));
   }
 }
