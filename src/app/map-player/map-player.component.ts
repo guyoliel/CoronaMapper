@@ -6,6 +6,7 @@ import { GeoJson } from '../models/GeoJson';
 import { FeatureCollection } from '../models/FeatureCollection';
 import { DynamicComponentService } from '../services/dynamic-component.service';
 import { TotalsPopupComponent } from './totals-popup/totals-popup.component';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'map-player',
@@ -13,6 +14,14 @@ import { TotalsPopupComponent } from './totals-popup/totals-popup.component';
   styleUrls: ['./map-player.component.css']
 })
 export class MapPlayerComponent implements OnInit{
+
+  control = new FormControl();
+
+  options = [
+    { id: 1, label: 'One' },
+    { id: 2, label: 'Two' },
+    { id: 3, label: 'Three' }
+  ];
 
   /// default settings
   map: mapboxgl.Map;
@@ -117,6 +126,11 @@ export class MapPlayerComponent implements OnInit{
     this.map.flyTo({
       center: data.geometry.coordinates
     });
+  }
+
+  flyToMarker(markerName: string) {
+    const [head] = this.markers.filter(marker => marker.properties.message === markerName);
+    this.flyTo(head);
   }
 
   setupMapCursorEvents(){

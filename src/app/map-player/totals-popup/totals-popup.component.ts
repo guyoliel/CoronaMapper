@@ -17,13 +17,18 @@ export class TotalsPopupComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.events = JSON.parse(this.properties.data);
+    this.events = JSON.parse(this.properties.data)
+    .map(event => {
+      event.recovered = this.numberWithCommas(event.recovered);
+      event.deaths = this.numberWithCommas(event.deaths);
+      event.confirmed = this.numberWithCommas(event.confirmed);
+      return event;
+    });
     this.latestEvent = this.events[this.events.length - 1];
+
   }
 
-  reduceSum(numbers: number[]){
-    return numbers.reduce((a, b) => {
-      console.log('a: ' + a + ' b: ' + b);
-      return a + b;});
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 }

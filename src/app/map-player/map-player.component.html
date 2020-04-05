@@ -1,1 +1,21 @@
+<mat-card class="search-card" >
+    <mat-form-field class="search-form-field">
+        <input matInput type="text" [formControl]="control" (keyup.enter)="flyToMarker(control.value)" [appAutocomplete]="autocomplete" placeholder="Search...">
+    </mat-form-field>
+    <button matButton color="primary" [disabled]="!control.value" mat-icon-button aria-label="Search" (click)="flyToMarker(control.value)">
+        <mat-icon>search</mat-icon>
+    </button>
+</mat-card>
+
+<app-autocomplete #autocomplete="appAutocomplete">
+<ng-template appAutocompleteContent>
+    <ng-container *ngIf="(markers | filter: control.value: ['properties','message']) as result">
+        <app-option *ngFor="let marker of result" [value]="marker.properties.message">
+            {{ marker.properties.message }}
+        </app-option>
+        <app-option class="no-result" *ngIf="!result.length">No result...</app-option>
+    </ng-container>
+</ng-template>
+</app-autocomplete>
+
 <div class="map" id="map"></div>
